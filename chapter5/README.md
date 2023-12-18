@@ -196,4 +196,47 @@ typedef struct
 + e_ident[5] 编码格式，0为非法，1为小端，2为大端
 + e_ident[6] 版本信息，默认为1，0为非法
 + e_ident[7~15] 保留位，默认为0
-+ e_type指定文件类型
++ e_type指定文件类型,下图为具体取值
+
+![这是图片](../imgs/chapter5/005.png "e_type")
+
++ e_machine指明可运行的硬件平台
+
+![这是图片](../imgs/chapter5/006.png "e_machine")
+
++ 剩余直接看注释
+
+程序头表的结构，用于描述磁盘上的程序中的一个段
+
+```C
+typedef struct
+{
+  Elf32_Word    p_type;                 /* Segment type */
+  Elf32_Off     p_offset;               /* Segment file offset */
+  Elf32_Addr    p_vaddr;                /* Segment virtual address */
+  Elf32_Addr    p_paddr;                /* Segment physical address */
+  Elf32_Word    p_filesz;               /* Segment size in file */
+  Elf32_Word    p_memsz;                /* Segment size in memory */
+  Elf32_Word    p_flags;                /* Segment flags */
+  Elf32_Word    p_align;                /* Segment alignment */
+} Elf32_Phdr;
+```
+解释：
+
++ p_type指明程序中该段类型
+![这是图片](../imgs/chapter5/007.png "e_machine")
++ p_flags指明该段权限
+![这是图片](../imgs/chapter5/008.png "e_machine")
++ p_align对齐方式，0或1表示不对齐
+### 举个栗子
+见004文件夹，使用./xxd.sh kernel.bin 0 300  
+
+第1行：7F 45 4C 46为固定值。02 01 01表示64位，小端，版本。  
+第2行：00 02 表示可执行文件。00 3E 表示AMD x86-64 architecture。00 00 00 01表示版本。C0 00 15 00 表示入口地址。00 00 00 00 程序头表偏移地址。  
+第3行：00 00 00 40 节头表偏移地址。00 00 00 00表示eflags。C0 11表示 elf header大小。00 00。表示程序头大小。00 00表示段个数。00 00表示各个节大小。  
+第4行：00 00表示节的个数
+
+### 一些问题
+
++ 文件无法运行，可能是windows上传的，使用set ff?查看格式，使用set ff=unix改为linux能运行
++ git无法识别 loose object 查看https://stackoverflow.com/questions/4254389/git-corrupt-loose-object
