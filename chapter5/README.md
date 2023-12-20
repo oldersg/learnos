@@ -171,6 +171,8 @@ ELF中目标文件类型分为：待重定位文件、共享目标文件（动�
 条目对应程序（节）头表中的一个程序（节）头里的描述信息  
 ELF信息包含在/usr/include/elf.h中  
 ELF由ELF Header、程序头表、节头表、ELF Sections组成  
+ELF header中的数据类型  
+![这是图片](../imgs/chapter5/017.png "eh数据类型")
 ELF header结构
 ```C
 #define EI_NIDENT (16)
@@ -187,6 +189,8 @@ typedef struct
   Elf32_Word    e_flags;                /* Processor-specific flags */
   Elf32_Half    e_ehsize;               /* ELF header size in bytes */
   Elf32_Half    e_phentsize;            /* Program header table entry size */
+  Elf32_Half    e_phnum;                /* Program header table entry count */
+  Elf32_Half    e_shentsize;            /* Section header table entry size */
   Elf32_Half    e_shnum;                /* Section header table entry count */
   Elf32_Half    e_shstrndx;             /* Section header string table index */
 } Elf32_Ehdr;
