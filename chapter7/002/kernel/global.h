@@ -21,7 +21,7 @@
 #define	 IDT_DESC_DPL3   3
 #define	 IDT_DESC_32_TYPE     0xE   // 32位的门
 #define	 IDT_DESC_16_TYPE     0x6   // 16位的门，不用，定义它只为和32位门区分
-#define	 IDT_DESC_ATTR_DPL0  ((IDT_DESC_P << 7) + (IDT_DESC_DPL0 << 5) + IDT_DESC_32_TYPE) //中断门描述符的8~15位
+#define	 IDT_DESC_ATTR_DPL0  ((IDT_DESC_P << 7) + (IDT_DESC_DPL0 << 5) + IDT_DESC_32_TYPE)
 #define	 IDT_DESC_ATTR_DPL3  ((IDT_DESC_P << 7) + (IDT_DESC_DPL3 << 5) + IDT_DESC_32_TYPE)
 
 #endif

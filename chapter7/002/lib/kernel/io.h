@@ -27,7 +27,6 @@ static inline void outsw(uint16_t port, const void* addr, uint32_t word_cnt) {
    +表示此限制即做输入又做输出.
    outsw是把ds:esi处的16位的内容写入port端口, 我们在设置段描述符时, 
    已经将ds,es,ss段的选择子都设置为相同的值了,此时不用担心数据错乱。*/
-   //+表示既作输入，又作输出，先被读入，再被写入（在重复指令中使用）
    asm volatile ("cld; rep outsw" : "+S" (addr), "+c" (word_cnt) : "d" (port));
 /******************************************************/
 }
@@ -45,7 +44,6 @@ static inline void insw(uint16_t port, void* addr, uint32_t word_cnt) {
    insw是将从端口port处读入的16位内容写入es:edi指向的内存,
    我们在设置段描述符时, 已经将ds,es,ss段的选择子都设置为相同的值了,
    此时不用担心数据错乱。*/
-   //+表示既作输入，又作输出，先被读入，再被写入（在重复指令中使用）
    asm volatile ("cld; rep insw" : "+D" (addr), "+c" (word_cnt) : "d" (port) : "memory");
 /******************************************************/
 }

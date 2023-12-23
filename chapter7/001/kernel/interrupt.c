@@ -13,10 +13,10 @@
 
 /*中断门描述符结构体*/
 struct gate_desc {
-    uint16_t    func_offset_low_word;
-    uint16_t    selector;
-    uint8_t     dcount;   //此项为双字计数字段，是门描述符中的第4字节。此项固定值，不用考虑
-    uint8_t     attribute;
+    uint16_t    func_offset_low_word; //偏移量
+    uint16_t    selector; //选择子
+    uint8_t     dcount;   //此项为双字计数字段，是门描述符中的第4字节。没有使用
+    uint8_t     attribute; //属性
     uint16_t    func_offset_high_word;
 };
 
@@ -50,7 +50,7 @@ static void pic_init(void) {
 
 /* 创建中断门描述符 */
 static void make_idt_desc(struct gate_desc* p_gdesc, uint8_t attr, intr_handler function) { 
-    p_gdesc->func_offset_low_word = (uint32_t)function & 0x0000FFFF;
+    p_gdesc->func_offset_low_word = (uint32_t)function & 0x0000FFFF; //每个中断对应一个中断函数，该函数在kernel.S
     p_gdesc->selector = SELECTOR_K_CODE;
     p_gdesc->dcount = 0;
     p_gdesc->attribute = attr;
@@ -73,6 +73,9 @@ void idt_init() {
     pic_init();		   // 初始化8259A
 
     /* 加载idt */
+    // 前16位是界限，后32位是基地址
+    // C中无48位的数，因此只要保证64位整数的低48位数据，
+    // 为了防止左移16位丢失高位的0，要转成63位整数
     uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)(uint32_t)idt << 16));
     asm volatile("lidt %0" : : "m" (idt_operand));
     put_str("idt_init done\n");
