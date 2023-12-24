@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "interrupt.h": "c",
+        "stdint.h": "c",
+        "bitmap.h": "c",
+        "global.h": "c"
+    }
+}
