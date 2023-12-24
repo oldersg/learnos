@@ -78,6 +78,7 @@ static void* palloc(struct pool* m_pool) {
       return NULL;
    }
    bitmap_set(&m_pool->pool_bitmap, bit_idx, 1);	// 将此位bit_idx置1
+   //根据在内存池中的索引，乘页大小从而得到偏移量
    uint32_t page_phyaddr = ((bit_idx * PG_SIZE) + m_pool->phy_addr_start);
    return (void*)page_phyaddr;
 }
@@ -93,6 +94,7 @@ static void page_table_add(void* _vaddr, void* _page_phyaddr) {
  * 否则会引发page_fault。因此在*pde为0时,*pte只能出现在下面else语句块中的*pde后面。
  * *********************************************************/
    /* 先在页目录内判断目录项的P位，若为1,则表示该表已存在 */
+   //*pde相当于把虚拟地址对应的页目录项的值取出来
    if (*pde & 0x00000001) {	 // 页目录项和页表项的第0位为P,此处判断目录项是否存在
       ASSERT(!(*pte & 0x00000001));
 
@@ -105,7 +107,7 @@ static void page_table_add(void* _vaddr, void* _page_phyaddr) {
    } else {			    // 页目录项不存在,所以要先创建页目录再创建页表项.
       /* 页表中用到的页框一律从内核空间分配 */
       uint32_t pde_phyaddr = (uint32_t)palloc(&kernel_pool);
-
+      //注意不是对pde赋值，而是*pde
       *pde = (pde_phyaddr | PG_US_U | PG_RW_W | PG_P_1);
 
       /* 分配到的物理页地址pde_phyaddr对应的物理内存清0,
@@ -122,6 +124,8 @@ static void page_table_add(void* _vaddr, void* _page_phyaddr) {
 
 /* 分配pg_cnt个页空间,成功则返回起始虚拟地址,失败时返回NULL */
 void* malloc_page(enum pool_flags pf, uint32_t pg_cnt) {
+   //内核和用户空间各约 16MB 空间，保守起见用 15MB 来限制，申请的内存
+   //页数要小于内存池大小，15MB就是3840
    ASSERT(pg_cnt > 0 && pg_cnt < 3840);
 /***********   malloc_page的原理是三个动作的合成:   ***********
       1通过vaddr_get在虚拟内存池中申请虚拟地址
